@@ -1,0 +1,2 @@
+20:10:25 Organism at position [4, 3], [935341282, 3515951229, 2198879245, 2321375513, 3982911623], [Connection(Source: -2, Target: 8, weight: 3.75)]
+08:40:56 Organism at position [17, 4], [2451946857, 3947939384, 3194864124, 848685264, 3629926589], [Connection(Source: 1, Target: 7, weight: -2.55)]
