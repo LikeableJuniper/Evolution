@@ -36,8 +36,8 @@ USEBRAINS = True
 GENOME_LENGTH = 20
 GENERATION_LENGTH = 200 # Numbers of frames before next generation is created.
 MAX_GENE_VALUE = 0xFFFFFFFF
-MUTATION_RATE = 0.01
-SIMULATION_SIZE = [100, 100]
+MUTATION_RATE = 0
+SIMULATION_SIZE = [30, 30]
 brain.init(SIMULATION_SIZE)
 squareSize = min(screensize)
 cellDimensions = [math.floor(squareSize/SIMULATION_SIZE[0]), math.floor(squareSize/SIMULATION_SIZE[1])]
@@ -66,12 +66,16 @@ class Criteria:
     class BORDER:
         id = 5
         quote = 0.1
+    class TEMPERATURE:
+        id = 6
+    class CENTER:
+        id = 7
 
 
-criteriaIDs = [Criteria.RIGHT.id, Criteria.LEFT.id, Criteria.UP.id, Criteria.DOWN.id, Criteria.BORDER.id]
+criteriaIDs = [Criteria.RIGHT.id, Criteria.LEFT.id, Criteria.UP.id, Criteria.DOWN.id, Criteria.BORDER.id, Criteria.TEMPERATURE.id, Criteria.CENTER.id]
 criteriaQuotes = [Criteria.RIGHT.quote, Criteria.LEFT.quote, Criteria.UP.quote, Criteria.DOWN.quote, Criteria.BORDER.quote]
-criteriaNames = ["Right", "Left", "Up", "Down", "Border"]
-reproduceCriteria = Criteria.UP.id
+criteriaNames = ["Right", "Left", "Up", "Down", "Border", "Temperature", "Center"]
+reproduceCriteria = Criteria.CENTER.id
 criteriaName = criteriaNames[criteriaIDs.index(reproduceCriteria)]
 
 
@@ -124,6 +128,7 @@ class Simulation:
         self.limit = [self.size[0]-1, self.size[1]-1]
         self.frames = 0
         self.generation = generation
+        self.centerChances = [[math.cos(4*x/self.size[0] - math.pi/2) + math.cos(4*y/self.size[1] - math.pi/2) for y in range(self.size[1])] for x in range(self.size[0])]
 
         if not generation:
             self.initiateColony(POPULATION_0, screen)
@@ -194,6 +199,12 @@ class Simulation:
                 elif criteria == Criteria.DOWN.id:
                     if yCoord > self.criteriaTolerances[criteriaIDs.index(criteria)][0]:
                         reproduce = True
+                elif criteria == Criteria.TEMPERATURE.id:
+                    if random.random() < min((yCoord/self.size[1])**2, 1):
+                        reproduce = True
+                elif criteria == Criteria.CENTER.id:
+                    if random.random() < self.centerChances[xCoord][yCoord]:
+                        reproduce = True
                 
                 if reproduce:
                     for _ in range(random.randint(1, 3)):
@@ -209,6 +220,7 @@ class Organism:
     def __init__(self, pos : list[int], genome : list[int], direction=[]):
         self.pos = pos
         self.genome = genome
+        self.motivation = random.random()+0.5
         if USEBRAINS:
             self.brain = brain.Brain(self.genome)
         else:
@@ -225,7 +237,9 @@ class Organism:
         return "Organism at position {}".format(self.pos)
     
     def __call__(self, position):
-        return self.brain(position, self.direction)
+        if random.random() < self.motivation:
+            return self.brain(position, self.direction)
+        else: return [0, 0]
 
     def __bool__(self):
         return True
