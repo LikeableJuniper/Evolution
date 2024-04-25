@@ -37,7 +37,7 @@ GENOME_LENGTH = 20
 GENERATION_LENGTH = 200 # Numbers of frames before next generation is created.
 MAX_GENE_VALUE = 0xFFFFFFFF
 MUTATION_RATE = 0
-SIMULATION_SIZE = [30, 30]
+SIMULATION_SIZE = [150, 150]
 brain.init(SIMULATION_SIZE)
 squareSize = min(screensize)
 cellDimensions = [math.floor(squareSize/SIMULATION_SIZE[0]), math.floor(squareSize/SIMULATION_SIZE[1])]
@@ -75,7 +75,7 @@ class Criteria:
 criteriaIDs = [Criteria.RIGHT.id, Criteria.LEFT.id, Criteria.UP.id, Criteria.DOWN.id, Criteria.BORDER.id, Criteria.TEMPERATURE.id, Criteria.CENTER.id]
 criteriaQuotes = [Criteria.RIGHT.quote, Criteria.LEFT.quote, Criteria.UP.quote, Criteria.DOWN.quote, Criteria.BORDER.quote]
 criteriaNames = ["Right", "Left", "Up", "Down", "Border", "Temperature", "Center"]
-reproduceCriteria = Criteria.CENTER.id
+reproduceCriteria = Criteria.TEMPERATURE.id
 criteriaName = criteriaNames[criteriaIDs.index(reproduceCriteria)]
 
 
@@ -128,7 +128,7 @@ class Simulation:
         self.limit = [self.size[0]-1, self.size[1]-1]
         self.frames = 0
         self.generation = generation
-        self.centerChances = [[math.cos(4*x/self.size[0] - math.pi/2) + math.cos(4*y/self.size[1] - math.pi/2) for y in range(self.size[1])] for x in range(self.size[0])]
+        self.centerChances = [[(math.cos((2*x/self.size[0]-1)*0.75*math.pi) + math.cos((2*y/self.size[1] - 1)*0.75*math.pi)) / 2 for y in range(self.size[1])] for x in range(self.size[0])]
 
         if not generation:
             self.initiateColony(POPULATION_0, screen)
